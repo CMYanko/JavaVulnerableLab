@@ -8,32 +8,25 @@ on:
   # but only for the main branch
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ master ]
   pull_request:
-    branches:
-      - main
+    branches: [ master ]
 
 jobs:
   NextGen-Static-Analysis:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    # We are building this application with Java 11
+    # We are building this application with Java 8
     - name: Setup Java JDK
       uses: actions/setup-java@v1.4.3
       with:
-        java-version: 11.0.x
+        java-version: 1.8
     - name: Package with maven
       run: mvn compile package
     - name: Download ShiftLeft CLI
       run: |
         curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
-    # ShiftLeft requires Java 1.8. Post the package step override the version
-    - name: Setup Java JDK
-      uses: actions/setup-java@v1.4.3
-      with:
-        java-version: 1.8
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
@@ -43,7 +36,7 @@ jobs:
     - name: NG SAST Trunk
       # Removed the --wait since we wont be checking the scan
       if: ${{ github.ref == 'refs/heads/main' }}
-      run: ${GITHUB_WORKSPACE}/sl analyze --app shiftleft-java-demo --tag branch=${{ github.head_ref || steps.extract_branch.outputs.branch }} --java  target/hello-shiftleft-*.jar
+      run: ${GITHUB_WORKSPACE}/sl analyze --app shiftleft-java-demo --tag app.group=VBD --tag branch=${{ github.head_ref || steps.extract_branch.outputs.branch }} --java  target/*.war
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
         SHIFTLEFT_ORG_ID: ${{ secrets.SHIFTLEFT_ORG_ID }}
