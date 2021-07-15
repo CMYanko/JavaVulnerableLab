@@ -36,7 +36,7 @@ jobs:
     - name: NG SAST Trunk
       # Removed the --wait since we wont be checking the scan
       if: ${{ github.ref == 'refs/heads/main' }}
-      run: ${GITHUB_WORKSPACE}/sl analyze --app shiftleft-java-demo --tag app.group=VBD --tag branch=${{ github.head_ref || steps.extract_branch.outputs.branch }} --java  target/*.war
+      run: ${GITHUB_WORKSPACE}/sl analyze --app JavaVulnerableLab --tag app.group=VBD --tag branch=${{ github.head_ref || steps.extract_branch.outputs.branch }} --java  target/*.war
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
         SHIFTLEFT_ORG_ID: ${{ secrets.SHIFTLEFT_ORG_ID }}
